@@ -50,7 +50,7 @@ def render(draft_path: Path, voice: str = DEFAULT_VOICE) -> Path:
 
     stem = draft_path.stem
     audio = OUTPUT_DIR / f"{stem}.mp3"
-    subtitles = OUTPUT_DIR / f"{stem}.vtt"
+    subtitles = OUTPUT_DIR / f"{stem}.srt"
     video = OUTPUT_DIR / f"{stem}-vertical.mp4"
 
     tts_command = [
