@@ -1,0 +1,2 @@
+# Core MVP uses Python standard library only.
+# Optional AI generation uses the OpenRouter-compatible HTTPS API directly.
