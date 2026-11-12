@@ -43,7 +43,7 @@ jobs:
           path: |
             output/*.json
             output/*.mp3
-            output/*.vtt
+            output/*.srt
             output/*.mp4
           if-no-files-found: error
           retention-days: 14
