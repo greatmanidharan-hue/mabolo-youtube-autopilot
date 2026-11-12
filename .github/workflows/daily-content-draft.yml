@@ -1,0 +1,35 @@
+name: Daily Tamil Content Draft
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 2 * * *" # 08:00 Asia/Kolkata (UTC+05:30)
+
+permissions:
+  contents: read
+
+jobs:
+  create-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate content draft
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+        run: python -m src.generate_content
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Save draft artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tamil-content-draft
+          path: output/*.json
+          if-no-files-found: error
+          retention-days: 14
