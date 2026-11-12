@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+output/*
+!output/.gitkeep
+token.json
+client_secrets.json
+*.mp4
+*.wav
+*.mp3
