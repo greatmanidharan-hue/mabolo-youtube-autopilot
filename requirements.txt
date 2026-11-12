@@ -1,2 +1,3 @@
-# Core MVP uses Python standard library only.
-# Optional AI generation uses the OpenRouter-compatible HTTPS API directly.
+# Core content generation uses Python standard library only.
+# Edge TTS provides optional online Tamil narration; FFmpeg is installed separately.
+edge-tts>=7.0.0,<8.0.0
