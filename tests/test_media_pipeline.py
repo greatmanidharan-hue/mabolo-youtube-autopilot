@@ -7,12 +7,17 @@ from src.render_video import build_ffmpeg_command, latest_draft
 
 
 class MediaPipelineTests(unittest.TestCase):
-    def test_ffmpeg_command_uses_vertical_background_and_subtitles(self):
+    def test_ffmpeg_command_uses_tamil_font_safe_subtitles_and_motion(self):
         command = build_ffmpeg_command(
             Path("background.png"), Path("voice.mp3"),
-            Path("captions.srt"), Path("short.mp4")
+            Path("captions.srt"), Path("short.mp4"), Path("/fonts/NotoSansTamil-Regular.ttf")
         )
-        self.assertIn("1080:1920", command[command.index("-vf") + 1])
+        video_filter = command[command.index("-vf") + 1]
+        self.assertIn("1080:1920", video_filter)
+        self.assertIn("fontsdir='/fonts'", video_filter)
+        self.assertIn("FontSize=18", video_filter)
+        self.assertIn("MarginV=250", video_filter)
+        self.assertIn("zoompan", video_filter)
         self.assertIn("libx264", command)
         self.assertIn("background.png", command)
         self.assertEqual(command[-1], "short.mp4")
