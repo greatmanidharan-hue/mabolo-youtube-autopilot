@@ -12,7 +12,7 @@ A Tamil-first workflow for creating original YouTube Shorts, with a review-first
 - [x] Daily GitHub Actions workflow and artifact output
 - [x] Unit tests for content, visuals and render command
 - [ ] Long-form video assembly
-- [ ] YouTube OAuth upload integration
+- [x] Review-first YouTube OAuth upload CLI (manual credentials required)
 - [ ] Analytics and performance feedback loop
 
 ## Editorial direction
