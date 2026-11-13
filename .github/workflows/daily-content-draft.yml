@@ -11,7 +11,7 @@ permissions:
 jobs:
   create-and-render:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,19 +25,20 @@ jobs:
           sudo apt-get install -y ffmpeg fonts-noto-core
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Generate content draft
+      - name: Configure optional AI provider
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-        run: python -m src.generate_content
+        run: |
+          echo "Optional AI provider configured: $([ -n "$OPENROUTER_API_KEY" ] && echo yes || echo no)"
       - name: Run tests
         run: python -m unittest discover -s tests -v
-      - name: Generate editorial quality report
-        run: python -m src.quality_check
-      - name: Generate Tamil voice, visuals and vertical video
+      - name: Generate three rotating Tamil Shorts
         env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
           TAMIL_TTS_VOICE: ta-IN-PallaviNeural
-        run: python -m src.render_video
+        run: python -m src.daily_batch --count 3
       - name: Save draft, visuals and video artifacts
         uses: actions/upload-artifact@v4
         with:
