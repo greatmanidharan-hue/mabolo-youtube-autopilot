@@ -10,7 +10,8 @@ A Tamil-first workflow for creating original YouTube Shorts, with a review-first
 - [x] Original generated Tamil-history themed background and thumbnail artwork
 - [x] FFmpeg 1080×1920 vertical video rendering
 - [x] Daily GitHub Actions workflow and artifact output
-- [x] Unit tests for content, visuals and render command
+- [x] Unit tests for content, visuals, render command and publishing safety
+- [x] Editorial quality report (blocks publish-ready status when sources are missing or offline template is used)
 - [ ] Long-form video assembly
 - [x] Review-first YouTube OAuth upload CLI (manual credentials required)
 - [ ] Analytics and performance feedback loop
@@ -45,8 +46,11 @@ Without `OPENROUTER_API_KEY`, a clearly labelled offline starter draft is genera
 ## Daily automation
 GitHub Actions is scheduled for 08:00 Asia/Kolkata. It creates a draft, runs tests, generates narration and visuals, renders a vertical video and stores the outputs as an artifact for 14 days. You can also run it manually from the Actions tab.
 
+## Editorial quality gate
+Each run writes a `*-quality.json` report beside the draft. Offline-template output is explicitly marked `draft_only`; missing source URLs are also a blocker. Even a draft with sources is only `ready_for_human_review`, never automatically approved. Public upload is blocked unless the draft has both `editorial_reviewed: true` (set only after a human fact-check) and verified `source_urls`. Private review remains the default.
+
 ## YouTube publishing
-The current workflow does **not** upload videos to YouTube. Uploading requires a Google OAuth 2.0 client, the YouTube Data API enabled, and authorization with the `youtube.upload` scope. The planned default is private review; public publishing must be explicitly enabled by the channel owner after testing.
+The current workflow does **not** upload videos to YouTube. Uploading requires a Google OAuth 2.0 client, the YouTube Data API enabled, and authorization with the `youtube.upload` scope. The planned default is private review; public publishing is blocked until the human-review and source checks pass.
 
 ## Copyright, factual accuracy and quality
 - Use original scripts, narration and artwork or assets with verified licences.
