@@ -18,7 +18,11 @@ def build_video_body(draft: dict[str, Any], privacy: str = "private") -> dict[st
         if draft.get("editorial_reviewed") is not True:
             raise ValueError("Public upload blocked: set editorial_reviewed=true only after a human review.")
         if not draft.get("source_urls"):
-            raise ValueError("Public upload blocked: add verified source_urls before publishing.")
+            raise ValueError("Public upload blocked: add source_urls before publishing.")
+        if draft.get("sources_verified") is not True:
+            raise ValueError("Public upload blocked: set sources_verified=true only after claim-by-claim human verification.")
+        if not draft.get("claim_checks"):
+            raise ValueError("Public upload blocked: add claim_checks documenting source verification.")
     title = str(draft.get("title") or draft.get("topic") or "Tamil History").strip()
     description = str(draft.get("description") or "").strip()
     hashtags = draft.get("hashtags") or []
