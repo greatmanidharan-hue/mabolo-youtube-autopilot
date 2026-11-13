@@ -19,6 +19,18 @@ class PreviewGalleryTests(unittest.TestCase):
         self.assertNotIn("<script>alert(1)</script>", html)
         self.assertIn("&lt;script&gt;", html)
 
+    def test_adds_android_file_picker_fallback(self):
+        html = build_preview_html([{
+            "title": "தமிழ் வரலாறு",
+            "topic": "கீழடி",
+            "video_path": "short.mp4",
+            "quality_status": "draft_only",
+        }])
+        self.assertIn('type="file"', html)
+        self.assertIn('accept="video/mp4,.mp4"', html)
+        self.assertIn("URL.createObjectURL(file)", html)
+        self.assertIn("Choose MP4 file", html)
+
     def test_writes_preview_index(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = write_preview_gallery([{
