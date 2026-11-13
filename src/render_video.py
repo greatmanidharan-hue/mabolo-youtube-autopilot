@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from src.create_visuals import create_visuals
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_DIR = ROOT / "output"
 DEFAULT_VOICE = "ta-IN-PallaviNeural"
@@ -20,18 +22,18 @@ def latest_draft() -> Path:
     return drafts[-1]
 
 
-def build_ffmpeg_command(audio: Path, subtitles: Path, video: Path) -> list[str]:
-    # FFmpeg's subtitles filter reads WebVTT; libass is required.
+def build_ffmpeg_command(background: Path, audio: Path, subtitles: Path, video: Path) -> list[str]:
     subtitle_filter = (
         f"subtitles={subtitles}:force_style="
         "'FontName=Noto Sans Tamil,FontSize=22,PrimaryColour=&H00FFFFFF,"
         "OutlineColour=&H00111111,BorderStyle=1,Outline=2,Alignment=2,MarginV=190'"
     )
+    video_filter = f"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,{subtitle_filter}"
     return [
         "ffmpeg", "-y",
-        "-f", "lavfi", "-i", "color=c=0x111827:s=1080x1920:r=30",
+        "-loop", "1", "-framerate", "30", "-i", str(background),
         "-i", str(audio),
-        "-vf", subtitle_filter,
+        "-vf", video_filter,
         "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "128k", "-shortest",
         "-movflags", "+faststart", str(video)
@@ -52,6 +54,7 @@ def render(draft_path: Path, voice: str = DEFAULT_VOICE) -> Path:
     audio = OUTPUT_DIR / f"{stem}.mp3"
     subtitles = OUTPUT_DIR / f"{stem}.srt"
     video = OUTPUT_DIR / f"{stem}-vertical.mp4"
+    background, thumbnail = create_visuals(draft_path)
 
     tts_command = [
         sys.executable, "-m", "edge_tts",
@@ -64,13 +67,14 @@ def render(draft_path: Path, voice: str = DEFAULT_VOICE) -> Path:
     if not audio.exists() or not subtitles.exists():
         raise RuntimeError("Voice provider did not create both audio and subtitle files.")
 
-    subprocess.run(build_ffmpeg_command(audio, subtitles, video), check=True)
+    subprocess.run(build_ffmpeg_command(background, audio, subtitles, video), check=True)
     print(f"Rendered video: {video.relative_to(ROOT)}")
+    print(f"Thumbnail: {thumbnail.relative_to(ROOT)}")
     return video
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Create Tamil voice-over and a vertical subtitled video.")
+    parser = argparse.ArgumentParser(description="Create Tamil voice-over, visuals and a vertical subtitled video.")
     parser.add_argument("--draft", type=Path, default=None, help="Draft JSON path; defaults to newest draft.")
     parser.add_argument("--voice", default=os.getenv("TAMIL_TTS_VOICE", DEFAULT_VOICE))
     args = parser.parse_args()
