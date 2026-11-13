@@ -41,7 +41,7 @@ The render step uses the newest `output/tamil-draft-*.json` file by default. To 
 python -m src.render_video --draft output/tamil-draft-YYYYMMDD-HHMMSS.json
 ```
 
-The generated outputs include JSON draft, MP3 narration, SRT subtitles, a 1080×1920 background, a 1280×720 thumbnail, an MP4 Short and a `preview-index.html` gallery. After downloading and extracting the Actions artifact, open `preview-index.html` in a browser to preview the Shorts and download individual MP4 files. The artwork is original programmatically generated artwork, not a photograph or a claim to depict a specific archaeological site.
+The generated outputs include JSON draft, MP3 narration, SRT subtitles, a 1080×1920 background, a 1280×720 thumbnail, an MP4 Short and a `preview-index.html` gallery. After downloading and extracting the Actions artifact, open `preview-index.html` in a browser to preview the Shorts and download individual MP4 files. **Android note:** when the HTML is opened through the Files app's `content://` preview, Chrome may not be able to resolve sibling MP4/JPG files. Use the gallery's **Choose MP4 file** control and select the matching MP4 from the extracted folder, or open the MP4 directly from Files. Keep the HTML and media files together in the same extracted folder. The artwork is original programmatically generated artwork, not a photograph or a claim to depict a specific archaeological site.
 
 ## AI provider
 Without `OPENROUTER_API_KEY`, a clearly labelled offline starter draft is generated. To enable AI-assisted scripts, add `OPENROUTER_API_KEY` under repository **Settings → Secrets and variables → Actions**. Optionally set the repository variable `OPENROUTER_MODEL`. Never commit API keys or send them in chat.
