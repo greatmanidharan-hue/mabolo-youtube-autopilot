@@ -5,13 +5,15 @@ Run from repository root:
 Output: output/keeladi-pilot-visual.mp4
 This is an artistic reconstruction, not a documentary reconstruction.
 """
-import bpy, math, os
+import bpy, math, os, shutil, subprocess
 from mathutils import Vector
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(ROOT, "output")
 os.makedirs(OUT, exist_ok=True)
 OUTPUT = os.path.join(OUT, "keeladi-pilot-visual.mp4")
+FRAME_DIR = os.path.join(OUT, "keeladi-pilot-frames")
+os.makedirs(FRAME_DIR, exist_ok=True)
 
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
@@ -21,12 +23,9 @@ scene.render.resolution_x, scene.render.resolution_y = 720, 1280
 scene.render.resolution_percentage = 100
 scene.render.fps = 24
 scene.frame_start, scene.frame_end = 1, 864
-scene.render.image_settings.file_format = "FFMPEG"
-scene.render.ffmpeg.format = "MPEG4"
-scene.render.ffmpeg.codec = "H264"
-scene.render.ffmpeg.constant_rate_factor = "MEDIUM"
-scene.render.ffmpeg.video_bitrate = 5000
-scene.render.filepath = OUTPUT
+scene.render.image_settings.file_format = "PNG"
+scene.render.image_settings.color_mode = "RGB"
+scene.render.filepath = os.path.join(FRAME_DIR, "frame_")
 scene.world.color = (0.22, 0.22, 0.22)
 scene.view_settings.view_transform = "AgX"
 
@@ -180,6 +179,21 @@ for action in bpy.data.actions:
     for fc in action.fcurves:
         for key in fc.keyframe_points: key.interpolation="BEZIER"
 scene.frame_set(1)
-print("Rendering Keeladi pilot:",OUTPUT)
+print("Rendering Keeladi pilot PNG frames:", FRAME_DIR)
 bpy.ops.render.render(animation=True)
-print("Finished:",OUTPUT)
+
+ffmpeg = shutil.which("ffmpeg")
+if ffmpeg:
+    pattern = os.path.join(FRAME_DIR, "frame_%04d.png")
+    cmd = [
+        ffmpeg, "-y", "-framerate", str(scene.render.fps),
+        "-i", pattern, "-c:v", "libx264", "-pix_fmt", "yuv420p",
+        "-crf", "20", "-movflags", "+faststart", OUTPUT
+    ]
+    print("Encoding MP4 with:", ffmpeg)
+    subprocess.run(cmd, check=True)
+    print("Finished MP4:", OUTPUT)
+else:
+    print("PNG render complete. FFmpeg was not found on PATH.")
+    print("Frames are saved in:", FRAME_DIR)
+    print('Install FFmpeg, then run: ffmpeg -y -framerate 24 -i "output/keeladi-pilot-frames/frame_%04d.png" -c:v libx264 -pix_fmt yuv420p -crf 20 "output/keeladi-pilot-visual.mp4"')
