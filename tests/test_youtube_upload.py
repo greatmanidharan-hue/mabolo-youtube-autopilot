@@ -13,6 +13,14 @@ class YouTubeUploadTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_video_body({"title": "test"}, "friends-only")
 
+    def test_public_upload_requires_human_review_and_sources(self):
+        with self.assertRaisesRegex(ValueError, "editorial_reviewed"):
+            build_video_body({"title": "test", "source_urls": ["https://example.org"]}, "public")
+
+    def test_public_upload_requires_sources_even_after_review(self):
+        with self.assertRaisesRegex(ValueError, "source_urls"):
+            build_video_body({"title": "test", "editorial_reviewed": True}, "public")
+
     def test_hashtag_metadata_is_appended(self):
         body = build_video_body({
             "title": "test", "description": "intro", "hashtags": ["#TamilHistory"]
