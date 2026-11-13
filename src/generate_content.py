@@ -7,20 +7,33 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 TOPICS_FILE = ROOT / "content" / "topics.json"
 OUTPUT_DIR = ROOT / "output"
 
 
-def load_topics() -> list[dict[str, str]]:
+def load_topics() -> list[dict[str, Any]]:
     return json.loads(TOPICS_FILE.read_text(encoding="utf-8"))
 
 
-def build_offline_draft(topic: dict[str, str]) -> dict[str, object]:
+def _source_metadata(topic: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "source_urls": list(topic.get("source_urls") or []),
+        "source_note": topic.get(
+            "source_note",
+            "Research leads only; verify each claim against the original publication."
+        ),
+        "sources_verified": False,
+        "claim_checks": []
+    }
+
+
+def build_offline_draft(topic: dict[str, Any]) -> dict[str, object]:
     title = topic["topic"]
     angle = topic["angle"]
-    return {
+    draft = {
         "title": title,
         "format": "YouTube Short",
         "language": "Tamil",
@@ -50,17 +63,24 @@ def build_offline_draft(topic: dict[str, str]) -> dict[str, object]:
         "generated_with": "offline-template",
         "review_required": True
     }
+    draft.update(_source_metadata(topic))
+    return draft
 
 
-def generate_with_openrouter(topic: dict[str, str], api_key: str, model: str) -> dict[str, object]:
+def generate_with_openrouter(topic: dict[str, Any], api_key: str, model: str) -> dict[str, object]:
+    source_urls = topic.get("source_urls") or []
     prompt = (
         "Write a concise, original Tamil YouTube Shorts draft (about 45-60 seconds) "
         "on the supplied topic. Return ONLY valid JSON with keys: title, script, "
         "description, hashtags (array), research_checklist (array). "
         "Do not invent facts, dates, quotations or archaeological findings. "
         "Clearly mark disputed or uncertain claims and request source verification. "
-        "Avoid copying any source text.\n"
-        f"Topic: {topic['topic']}\nAngle: {topic['angle']}"
+        "Avoid copying any source text. The URLs supplied below are research leads only: "
+        "do not imply you opened or read them, do not invent citations, and do not claim "
+        "they prove any statement. Ask the human editor to verify every factual claim "
+        "against the original publication.\n"
+        f"Topic: {topic['topic']}\nAngle: {topic['angle']}\n"
+        f"Research lead URLs: {json.dumps(source_urls, ensure_ascii=False)}"
     )
     body = json.dumps({
         "model": model,
@@ -95,6 +115,7 @@ def generate_with_openrouter(topic: dict[str, str], api_key: str, model: str) ->
         "generated_with": model,
         "review_required": True
     })
+    draft.update(_source_metadata(topic))
     return draft
 
 
