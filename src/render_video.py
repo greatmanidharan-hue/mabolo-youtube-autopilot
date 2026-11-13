@@ -28,9 +28,9 @@ def build_ffmpeg_command(background: Path, audio: Path, subtitles: Path, video: 
     font_dir = font_path.parent
     subtitle_filter = (
         f"subtitles='{subtitles}':fontsdir='{font_dir}':force_style="
-        "'FontName=Noto Sans Tamil,FontSize=18,PrimaryColour=&H00FFFFFF,"
+        "'FontName=Noto Sans Tamil,FontSize=16,PrimaryColour=&H00FFFFFF,"
         "OutlineColour=&H00111111,BorderStyle=1,Outline=2,Shadow=0,"
-        "Alignment=2,MarginV=250,MarginL=90,MarginR=90,WrapStyle=2'"
+        "Alignment=2,MarginV=270,MarginL=110,MarginR=110,WrapStyle=0'"
     )
     # Slow, subtle push-in keeps a still illustration from feeling completely static.
     motion_filter = (
