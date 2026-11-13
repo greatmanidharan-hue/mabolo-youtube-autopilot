@@ -23,7 +23,7 @@ A Tamil-first workflow for creating original YouTube Shorts, with a review-first
 Initial direction: **Tamil History & Ancient Mysteries**. Separate archaeological evidence, scholarly interpretation, literary tradition and folklore. Never present disputed claims as established fact.
 
 ## Local setup
-Requires Python 3.11+, FFmpeg with the subtitles/libass filter, and a Tamil font such as Noto Sans Tamil.
+Requires Python 3.11+, FFmpeg with the subtitles/libass filter, and Noto Sans Tamil. Rendering now fails fast if a Tamil-capable font is missing instead of silently substituting a Latin-only font. Set `TAMIL_FONT_PATH` to the font file on Windows or Linux if it is installed in a non-standard location.
 
 ```bash
 python -m venv .venv
@@ -35,7 +35,7 @@ python -m unittest discover -s tests -v
 python -m src.render_video
 ```
 
-The render step uses the newest `output/tamil-draft-*.json` file by default. To render a particular draft:
+The render step uses the newest `output/tamil-draft-*.json` file by default. Captions use a smaller font, wider side margins and a higher bottom safe margin; the background also receives a subtle slow push-in. To render a particular draft:
 
 ```bash
 python -m src.render_video --draft output/tamil-draft-YYYYMMDD-HHMMSS.json
