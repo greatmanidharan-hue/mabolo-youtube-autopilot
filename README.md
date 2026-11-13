@@ -14,7 +14,7 @@ A Tamil-first workflow for creating original YouTube Shorts, with a review-first
 - [x] Review-first upload queue manifest with private-by-default status
 - [x] Offline HTML preview gallery with embedded video players and MP4 download links
 - [x] Unit tests for content, visuals, render command and publishing safety
-- [x] Editorial quality report (blocks publish-ready status when sources are missing or offline template is used)
+- [x] Editorial quality report distinguishes research leads from claim-level verification
 - [ ] Long-form video assembly
 - [x] Review-first YouTube OAuth upload CLI (manual credentials required)
 - [ ] Analytics and performance feedback loop
@@ -50,10 +50,10 @@ Without `OPENROUTER_API_KEY`, a clearly labelled offline starter draft is genera
 GitHub Actions is scheduled for 08:00 Asia/Kolkata. It selects three different topics using a date-based rotation, creates three drafts, runs tests, applies the editorial quality gate, generates Tamil narration and visuals for each, renders three vertical videos, writes an `upload-queue-*.json` review manifest plus an `preview-index.html` gallery with embedded players and MP4 download links, then stores the outputs as an artifact for 14 days. The queue records file paths, quality blockers and a private upload default; it does not upload or publish anything. If no AI key is configured, offline drafts are deliberately marked `draft_only` and must be researched and rewritten before publishing. You can also run it manually from the Actions tab.
 
 ## Editorial quality gate
-Each run writes a `*-quality.json` report beside the draft. Offline-template output is explicitly marked `draft_only`; missing source URLs are also a blocker. Even a draft with sources is only `ready_for_human_review`, never automatically approved. Public upload is blocked unless the draft has both `editorial_reviewed: true` (set only after a human fact-check) and verified `source_urls`. Private review remains the default.
+Each run writes a `*-quality.json` report beside the draft. Offline-template output is explicitly marked `draft_only`; missing source URLs are also a blocker. Even a draft with sources is only `ready_for_human_review`, never automatically approved. Topic source URLs are research leads only, not proof that claims were checked. Drafts start with `sources_verified: false` and an empty `claim_checks` list. Public upload is blocked unless `editorial_reviewed: true`, `sources_verified: true`, non-empty `source_urls`, and non-empty `claim_checks` are present. These fields must only be set after a human checks each factual claim against the original publication. The quality report never auto-approves a draft. Private review remains the default.
 
 ## YouTube publishing
-The current workflow does **not** upload videos to YouTube. Uploading requires a Google OAuth 2.0 client, the YouTube Data API enabled, and authorization with the `youtube.upload` scope. The planned default is private review; public publishing is blocked until the human-review and source checks pass.
+The current workflow does **not** upload videos to YouTube. Uploading requires a Google OAuth 2.0 client, the YouTube Data API enabled, and authorization with the `youtube.upload` scope. The local CLI defaults to private. Public publishing is blocked until a human has completed editorial review and documented claim-by-claim source verification (`sources_verified: true` and non-empty `claim_checks`). Do not manually set these flags without completing that review.
 
 ## Copyright, factual accuracy and quality
 - Use original scripts, narration and artwork or assets with verified licences.
