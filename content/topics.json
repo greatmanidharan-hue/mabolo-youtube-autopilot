@@ -1,22 +1,48 @@
 [
   {
     "topic": "கீழடி அகழாய்வு: தமிழர் வாழ்வியலைப் பற்றி கிடைத்துள்ள தொல்லியல் சான்றுகள்",
-    "angle": "கண்டுபிடிக்கப்பட்ட பொருட்கள், அவை உறுதிப்படுத்துவது, இன்னும் ஆய்வில் உள்ள கேள்விகள்"
+    "angle": "கண்டுபிடிக்கப்பட்ட பொருட்கள், அவை உறுதிப்படுத்துவது, இன்னும் ஆய்வில் உள்ள கேள்விகள்",
+    "source_urls": [
+      "https://www.tnarch.gov.in/keeladi",
+      "https://culture.gov.in/latest-news/asi-publishes-keezhadi-excavation-report-line-scientific-protocols",
+      "https://www.tamildigitallibrary.in/assets/docs/uploads/catalogue_article_file/BOK/upload/2025/09/TVA_TVA_BOK_062719/upload_primary_20250923041727978_20250923031529.pdf"
+    ],
+    "source_note": "Starting references only; verify exact claims against the linked report/publication before publication."
   },
   {
     "topic": "பண்டைய தமிழர்களின் கடல் வாணிபம்",
-    "angle": "சங்க இலக்கியக் குறிப்புகள், துறைமுகங்கள் மற்றும் வெளிநாட்டு தொல்லியல் சான்றுகள்"
+    "angle": "சங்க இலக்கியக் குறிப்புகள், துறைமுகங்கள் மற்றும் வெளிநாட்டு தொல்லியல் சான்றுகள்",
+    "source_urls": [
+      "https://www.tnarch.gov.in/e-publication-books-latest",
+      "https://www.nature.com/articles/s40494-020-00402-2"
+    ],
+    "source_note": "Starting references only; verify exact claims against the linked report/publication before publication."
   },
   {
     "topic": "சங்ககால நகர வாழ்க்கை எப்படி இருந்தது?",
-    "angle": "இலக்கியம் மற்றும் தொல்லியல் ஆதாரங்களை தனித்தனியாக விளக்குதல்"
+    "angle": "இலக்கியம் மற்றும் தொல்லியல் ஆதாரங்களை தனித்தனியாக விளக்குதல்",
+    "source_urls": [
+      "https://www.tnarch.gov.in/e-publication-books-latest",
+      "https://www.tnarch.gov.in/view-archaeology"
+    ],
+    "source_note": "Starting references only; verify exact claims against the linked report/publication before publication."
   },
   {
     "topic": "பண்டைய தமிழகத்தின் நீர்மேலாண்மை முறைகள்",
-    "angle": "ஏரிகள், கால்வாய்கள், அணைகள் மற்றும் அவற்றின் பொறியியல் முக்கியத்துவம்"
+    "angle": "ஏரிகள், கால்வாய்கள், அணைகள் மற்றும் அவற்றின் பொறியியல் முக்கியத்துவம்",
+    "source_urls": [
+      "https://www.tnarch.gov.in/e-publication-books-latest",
+      "https://www.tnarch.gov.in/view-archaeology"
+    ],
+    "source_note": "Starting references only; verify exact claims against the linked report/publication before publication."
   },
   {
     "topic": "பூம்புகார்: இலக்கியத்தில் வரும் துறைமுக நகரமும் கடலடித் தேடல்களும்",
-    "angle": "இலக்கிய மரபு, ஆய்வு முடிவுகள், உறுதிப்படுத்தப்படாத கூற்றுகள்"
+    "angle": "இலக்கிய மரபு, ஆய்வு முடிவுகள், உறுதிப்படுத்தப்படாத கூற்றுகள்",
+    "source_urls": [
+      "https://www.tnarch.gov.in/view-archaeology",
+      "https://www.tnarch.gov.in/e-publication-books-latest"
+    ],
+    "source_note": "Starting references only; verify exact claims against the linked report/publication before publication."
   }
 ]
