@@ -14,6 +14,11 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 def build_video_body(draft: dict[str, Any], privacy: str = "private") -> dict[str, Any]:
     if privacy not in {"private", "unlisted", "public"}:
         raise ValueError("privacy must be private, unlisted or public")
+    if privacy == "public":
+        if draft.get("editorial_reviewed") is not True:
+            raise ValueError("Public upload blocked: set editorial_reviewed=true only after a human review.")
+        if not draft.get("source_urls"):
+            raise ValueError("Public upload blocked: add verified source_urls before publishing.")
     title = str(draft.get("title") or draft.get("topic") or "Tamil History").strip()
     description = str(draft.get("description") or "").strip()
     hashtags = draft.get("hashtags") or []
