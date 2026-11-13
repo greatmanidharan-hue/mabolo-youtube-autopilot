@@ -11,7 +11,7 @@ permissions:
 jobs:
   create-and-render:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,11 +32,11 @@ jobs:
         run: python -m src.generate_content
       - name: Run tests
         run: python -m unittest discover -s tests -v
-      - name: Generate Tamil voice and vertical video
+      - name: Generate Tamil voice, visuals and vertical video
         env:
           TAMIL_TTS_VOICE: ta-IN-PallaviNeural
         run: python -m src.render_video
-      - name: Save draft and video artifacts
+      - name: Save draft, visuals and video artifacts
         uses: actions/upload-artifact@v4
         with:
           name: mabolo-tamil-youtube-short
@@ -44,6 +44,8 @@ jobs:
             output/*.json
             output/*.mp3
             output/*.srt
+            output/*.png
+            output/*.jpg
             output/*.mp4
           if-no-files-found: error
           retention-days: 14
