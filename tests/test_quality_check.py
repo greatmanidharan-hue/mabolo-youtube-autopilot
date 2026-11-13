@@ -16,7 +16,7 @@ class QualityCheckTests(unittest.TestCase):
         self.assertFalse(report["publish_allowed"])
         self.assertTrue(any("Offline template" in item for item in report["blockers"]))
 
-    def test_sources_do_not_remove_human_review_requirement(self):
+    def test_research_links_alone_are_not_verified_claims(self):
         report = assess_draft({
             "title": "தமிழ் வரலாறு",
             "script": "தமிழ் " * 100,
@@ -27,6 +27,26 @@ class QualityCheckTests(unittest.TestCase):
         })
         self.assertEqual(report["status"], "ready_for_human_review")
         self.assertFalse(report["publish_allowed"])
+        self.assertFalse(report["sources_verified"])
+        self.assertEqual(report["claim_check_count"], 0)
+        self.assertTrue(any("research leads" in item for item in report["warnings"]))
+        self.assertTrue(any("claim-by-claim" in item for item in report["warnings"]))
+
+    def test_claim_verification_is_reported_but_never_auto_approves(self):
+        report = assess_draft({
+            "title": "தமிழ் வரலாறு",
+            "script": "தமிழ் " * 100,
+            "generated_with": "provider/model",
+            "source_urls": ["https://example.org/research"],
+            "sources_verified": True,
+            "claim_checks": [{"claim": "Test", "verified": True}],
+            "research_checklist": ["ஆதாரத்தை சரிபார்க்கவும்"],
+            "review_required": True
+        })
+        self.assertEqual(report["status"], "ready_for_human_review")
+        self.assertFalse(report["publish_allowed"])
+        self.assertTrue(report["sources_verified"])
+        self.assertEqual(report["claim_check_count"], 1)
 
 
 if __name__ == "__main__":
