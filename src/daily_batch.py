@@ -12,6 +12,7 @@ from src.generate_content import (
     generate_with_openrouter,
     load_topics,
 )
+from src.preview_gallery import write_preview_gallery
 from src.quality_check import assess_draft
 from src.render_video import DEFAULT_VOICE, render
 from src.upload_queue import build_queue_entry, write_upload_queue
@@ -51,6 +52,7 @@ def run_batch(count: int = 3) -> list[Path]:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     results: list[Path] = []
     queue_entries: list[dict[str, Any]] = []
+    preview_entries: list[dict[str, Any]] = []
 
     for index, topic in enumerate(topics, start=1):
         draft_path = write_draft(topic, index, api_key, model, stamp)
@@ -58,13 +60,23 @@ def run_batch(count: int = 3) -> list[Path]:
         report_path = draft_path.with_name(draft_path.stem + "-quality.json")
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         video_path = render(draft_path, voice)
+        thumbnail_path = OUTPUT_DIR / f"{draft_path.stem}-thumbnail.jpg"
         results.extend([draft_path, report_path, video_path])
         queue_entries.append(build_queue_entry(draft_path, video_path, report_path))
+        preview_entries.append({
+            "title": report["title"],
+            "topic": topic["topic"],
+            "video_path": video_path,
+            "thumbnail_path": thumbnail_path if thumbnail_path.exists() else None,
+            "quality_status": report["status"],
+        })
         print(f"Batch item {index}/{len(topics)} complete: {topic['topic']}")
 
     queue_path = write_upload_queue(queue_entries)
-    results.append(queue_path)
+    preview_path = write_preview_gallery(preview_entries, OUTPUT_DIR)
+    results.extend([queue_path, preview_path])
     print(f"Review queue created: {queue_path.relative_to(ROOT)}")
+    print(f"Preview gallery created: {preview_path.relative_to(ROOT)}")
     return results
 
 
