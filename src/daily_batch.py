@@ -20,7 +20,7 @@ from src.upload_queue import build_queue_entry, write_upload_queue
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def select_daily_topics(day: date, count: int = 3) -> list[dict[str, str]]:
+def select_daily_topics(day: date, count: int = 3) -> list[dict[str, Any]]:
     if count < 1:
         raise ValueError("count must be at least 1")
     topics = load_topics()
@@ -30,7 +30,7 @@ def select_daily_topics(day: date, count: int = 3) -> list[dict[str, str]]:
     return [topics[(start + offset) % len(topics)] for offset in range(min(count, len(topics)))]
 
 
-def write_draft(topic: dict[str, str], index: int, api_key: str, model: str, stamp: str) -> Path:
+def write_draft(topic: dict[str, Any], index: int, api_key: str, model: str, stamp: str) -> Path:
     draft: dict[str, Any] = (
         generate_with_openrouter(topic, api_key, model)
         if api_key else build_offline_draft(topic)
