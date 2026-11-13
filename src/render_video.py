@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from src.create_visuals import create_scene_visuals, create_visuals, tamil_font_path
+from src.create_visuals import create_visuals, tamil_font_path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_DIR = ROOT / "output"
@@ -124,7 +124,9 @@ def render(draft_path: Path, voice: str = DEFAULT_VOICE) -> Path:
     if not audio.exists() or not subtitles.exists():
         raise RuntimeError("Voice provider did not create both audio and subtitle files.")
 
-    scenes = create_scene_visuals(draft_path)
+    scenes = sorted(OUTPUT_DIR.glob(f"{stem}-scene-*.png"))
+    if len(scenes) != 4:
+        raise RuntimeError(f"Expected four generated scene images, found {len(scenes)}")
     manifest = OUTPUT_DIR / f"{stem}-scenes.txt"
     _write_scene_concat_file(scenes, _audio_duration(audio), manifest)
     subprocess.run(build_slideshow_command(manifest, audio, subtitles, video, font_path), check=True)
