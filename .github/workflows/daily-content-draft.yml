@@ -44,5 +44,6 @@ jobs:
             output/*.png
             output/*.jpg
             output/*.mp4
+            output/*.html
           if-no-files-found: error
           retention-days: 14
