@@ -34,6 +34,18 @@ def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(tamil_font_path(bold)), size=size)
 
 
+def _latin_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
+    """Use a Latin font for the English brand label, separate from Tamil text."""
+    candidates = [
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+        Path("C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf"),
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return ImageFont.truetype(str(candidate), size=size)
+    raise RuntimeError("A Latin-capable font is required for the English brand label.")
+
+
 def _gradient(size: tuple[int, int]) -> Image.Image:
     width, height = size
     image = Image.new("RGB", size)
@@ -96,7 +108,7 @@ def create_visuals(draft_path: Path) -> tuple[Path, Path]:
     _temple_silhouette(draw, (150, 1050, 930, 1640))
     draw.rounded_rectangle((70, 90, 1010, 300), radius=34, fill=(7, 12, 26, 190),
                            outline=(220, 167, 93, 170), width=3)
-    draw.text((105, 145), "MABOLO • TAMIL HISTORY", font=_font(38, True),
+    draw.text((105, 145), "MABOLO • TAMIL HISTORY", font=_latin_font(38, True),
               fill=(235, 194, 125, 255))
     vertical_path = OUTPUT_DIR / f"{stem}-background.png"
     vertical.save(vertical_path, optimize=True)
