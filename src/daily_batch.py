@@ -14,6 +14,7 @@ from src.generate_content import (
 )
 from src.quality_check import assess_draft
 from src.render_video import DEFAULT_VOICE, render
+from src.upload_queue import build_queue_entry, write_upload_queue
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -49,6 +50,7 @@ def run_batch(count: int = 3) -> list[Path]:
     topics = select_daily_topics(today, count)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     results: list[Path] = []
+    queue_entries: list[dict[str, Any]] = []
 
     for index, topic in enumerate(topics, start=1):
         draft_path = write_draft(topic, index, api_key, model, stamp)
@@ -57,8 +59,12 @@ def run_batch(count: int = 3) -> list[Path]:
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         video_path = render(draft_path, voice)
         results.extend([draft_path, report_path, video_path])
+        queue_entries.append(build_queue_entry(draft_path, video_path, report_path))
         print(f"Batch item {index}/{len(topics)} complete: {topic['topic']}")
 
+    queue_path = write_upload_queue(queue_entries)
+    results.append(queue_path)
+    print(f"Review queue created: {queue_path.relative_to(ROOT)}")
     return results
 
 
