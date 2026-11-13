@@ -1,22 +1,25 @@
 # MABOLO TECH — YouTube Auto Pilot
 
-A Tamil-first, copyright-conscious content workflow for planning, scripting, rendering and publishing original YouTube videos.
+A Tamil-first workflow for creating original YouTube Shorts, with a review-first publishing approach.
 
 ## MVP status
-- [x] Repository foundation
-- [x] Tamil content draft generator (OpenRouter optional; offline fallback)
-- [x] Daily GitHub Actions content-draft workflow
-- [x] Automated tests
-- [ ] Voice generation adapter
-- [ ] FFmpeg video renderer
+- [x] Tamil topic bank and script draft generator
+- [x] Optional OpenRouter-compatible AI script generation
+- [x] Tamil text-to-speech adapter (Edge TTS)
+- [x] SRT subtitle generation
+- [x] Original generated Tamil-history themed background and thumbnail artwork
+- [x] FFmpeg 1080×1920 vertical video rendering
+- [x] Daily GitHub Actions workflow and artifact output
+- [x] Unit tests for content, visuals and render command
+- [ ] Long-form video assembly
 - [ ] YouTube OAuth upload integration
-- [ ] Scheduled publishing and analytics
+- [ ] Analytics and performance feedback loop
 
-## Current channel direction
-Initial editorial direction: **Tamil History & Ancient Mysteries**. Treat historical claims carefully: distinguish primary evidence, scholarly interpretation and folklore. Never present uncertain claims as established fact.
+## Editorial direction
+Initial direction: **Tamil History & Ancient Mysteries**. Separate archaeological evidence, scholarly interpretation, literary tradition and folklore. Never present disputed claims as established fact.
 
-## Quick start
-Requires Python 3.11+.
+## Local setup
+Requires Python 3.11+, FFmpeg with the subtitles/libass filter, and a Tamil font such as Noto Sans Tamil.
 
 ```bash
 python -m venv .venv
@@ -24,28 +27,40 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 python -m src.generate_content
+python -m unittest discover -s tests -v
+python -m src.render_video
 ```
 
-Without an API key, the generator creates a clearly labelled starter draft from the local topic bank. To use an OpenAI-compatible provider such as OpenRouter, set `OPENROUTER_API_KEY` and optionally `OPENROUTER_MODEL`.
+The render step uses the newest `output/tamil-draft-*.json` file by default. To render a particular draft:
 
-## GitHub Actions
-The daily workflow creates a content draft and uploads it as an artifact. Add `OPENROUTER_API_KEY` under repository **Settings → Secrets and variables → Actions** to enable AI-generated drafts. Do not put keys in source code or chat.
+```bash
+python -m src.render_video --draft output/tamil-draft-YYYYMMDD-HHMMSS.json
+```
+
+The generated outputs include JSON draft, MP3 narration, SRT subtitles, a 1080×1920 background, a 1280×720 thumbnail and an MP4 Short. The artwork is original programmatically generated artwork, not a photograph or a claim to depict a specific archaeological site.
+
+## AI provider
+Without `OPENROUTER_API_KEY`, a clearly labelled offline starter draft is generated. To enable AI-assisted scripts, add `OPENROUTER_API_KEY` under repository **Settings → Secrets and variables → Actions**. Optionally set the repository variable `OPENROUTER_MODEL`. Never commit API keys or send them in chat.
+
+## Daily automation
+GitHub Actions is scheduled for 08:00 Asia/Kolkata. It creates a draft, runs tests, generates narration and visuals, renders a vertical video and stores the outputs as an artifact for 14 days. You can also run it manually from the Actions tab.
 
 ## YouTube publishing
-Uploading requires Google OAuth 2.0 authorization with the `youtube.upload` scope and the YouTube Data API enabled. This project will default to **private/unlisted review**, not automatic public publishing, until the owner explicitly changes the setting and tests the full upload flow.
+The current workflow does **not** upload videos to YouTube. Uploading requires a Google OAuth 2.0 client, the YouTube Data API enabled, and authorization with the `youtube.upload` scope. The planned default is private review; public publishing must be explicitly enabled by the channel owner after testing.
 
-## Safety and quality
-- Use original scripts, narration and visuals, or assets with verified licences.
-- Do not reuse copyrighted footage/music without permission.
-- Fact-check historical claims and cite sources in video descriptions.
-- Add meaningful narration, analysis and editing; avoid mass-produced repetitive videos.
-- Review every generated video before enabling public auto-publishing.
+## Copyright, factual accuracy and quality
+- Use original scripts, narration and artwork or assets with verified licences.
+- Do not use copyrighted footage/music without permission.
+- Fact-check historical claims and include reliable source links in descriptions.
+- Add meaningful narration, analysis and editing; avoid repetitive mass-produced uploads.
+- Review each generated video before public publishing.
+- Edge TTS is an online service; confirm its current terms and permitted use before monetized production.
 
 ## Project structure
 ```
-src/                  content generation
+src/                  content generation, visuals and rendering
 tests/                automated tests
-content/topics.json   starter topic bank
-output/               generated drafts (git-ignored)
+content/topics.json   starter Tamil topic bank
+output/               generated files (git-ignored)
 .github/workflows/    scheduled automation
 ```
