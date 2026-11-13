@@ -34,7 +34,7 @@ class MediaPipelineTests(unittest.TestCase):
             command = build_slideshow_command(manifest, root / "voice.mp3", root / "captions.srt",
                                               root / "out.mp4", Path("/fonts/NotoSansTamil.ttf"))
             self.assertIn("concat", command)
-            self.assertIn("captions.srt", command)
+            self.assertTrue(any("captions.srt" in argument for argument in command))
 
     def test_latest_draft_requires_existing_draft(self):
         with tempfile.TemporaryDirectory() as tmp:
