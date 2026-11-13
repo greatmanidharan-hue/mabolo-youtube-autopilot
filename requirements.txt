@@ -1,3 +1,3 @@
-# Core content generation uses Python standard library only.
-# Edge TTS provides optional online Tamil narration; FFmpeg is installed separately.
+# Python packages for content, narration and generated visual assets.
 edge-tts>=7.0.0,<8.0.0
+Pillow>=10.0.0,<13.0.0
