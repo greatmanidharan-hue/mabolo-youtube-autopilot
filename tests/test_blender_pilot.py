@@ -9,7 +9,8 @@ class BlenderPilotTests(unittest.TestCase):
         compile(source, str(script), "exec")
         for token in ("SHOT_%d", "keeladi-pilot-visual.mp4"):
             self.assertIn(token, source)
-        self.assertIn("BLENDER_EEVEE_NEXT", source)
+        self.assertIn('scene.render.engine = "BLENDER_EEVEE"', source)
+        self.assertIn('scene.render.image_settings.file_format = "PNG"', source)
 
 
 if __name__ == "__main__":
