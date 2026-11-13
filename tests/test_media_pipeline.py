@@ -15,8 +15,10 @@ class MediaPipelineTests(unittest.TestCase):
         video_filter = command[command.index("-vf") + 1]
         self.assertIn("1080:1920", video_filter)
         self.assertIn("fontsdir='/fonts'", video_filter)
-        self.assertIn("FontSize=18", video_filter)
-        self.assertIn("MarginV=250", video_filter)
+        self.assertIn("FontSize=16", video_filter)
+        self.assertIn("MarginV=270", video_filter)
+        self.assertIn("WrapStyle=0", video_filter)
+        self.assertIn("MarginL=110", video_filter)
         self.assertIn("zoompan", video_filter)
         self.assertIn("libx264", command)
         self.assertIn("background.png", command)
