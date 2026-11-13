@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from src.create_visuals import create_visuals
+from src.create_visuals import create_visuals, tamil_font_path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_DIR = ROOT / "output"
@@ -22,13 +22,26 @@ def latest_draft() -> Path:
     return drafts[-1]
 
 
-def build_ffmpeg_command(background: Path, audio: Path, subtitles: Path, video: Path) -> list[str]:
+def build_ffmpeg_command(background: Path, audio: Path, subtitles: Path, video: Path,
+                         font_path: Path | None = None) -> list[str]:
+    font_path = font_path or tamil_font_path()
+    font_dir = font_path.parent
     subtitle_filter = (
-        f"subtitles={subtitles}:force_style="
-        "'FontName=Noto Sans Tamil,FontSize=22,PrimaryColour=&H00FFFFFF,"
-        "OutlineColour=&H00111111,BorderStyle=1,Outline=2,Alignment=2,MarginV=190'"
+        f"subtitles='{subtitles}':fontsdir='{font_dir}':force_style="
+        "'FontName=Noto Sans Tamil,FontSize=18,PrimaryColour=&H00FFFFFF,"
+        "OutlineColour=&H00111111,BorderStyle=1,Outline=2,Shadow=0,"
+        "Alignment=2,MarginV=250,MarginL=90,MarginR=90,WrapStyle=2'"
     )
-    video_filter = f"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,{subtitle_filter}"
+    # Slow, subtle push-in keeps a still illustration from feeling completely static.
+    motion_filter = (
+        "zoompan=z='min(zoom+0.00015,1.035)':"
+        "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
+        "d=1:s=1080x1920:fps=30"
+    )
+    video_filter = (
+        f"scale=1080:1920:force_original_aspect_ratio=increase,"
+        f"crop=1080:1920,{motion_filter},{subtitle_filter}"
+    )
     return [
         "ffmpeg", "-y",
         "-loop", "1", "-framerate", "30", "-i", str(background),
@@ -43,7 +56,7 @@ def build_ffmpeg_command(background: Path, audio: Path, subtitles: Path, video: 
 def render(draft_path: Path, voice: str = DEFAULT_VOICE) -> Path:
     if not shutil.which("ffmpeg"):
         raise RuntimeError("FFmpeg was not found. Install FFmpeg and ensure it is on PATH.")
-
+    font_path = tamil_font_path()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     draft = json.loads(draft_path.read_text(encoding="utf-8"))
     script = str(draft.get("script", "")).strip()
@@ -67,7 +80,7 @@ def render(draft_path: Path, voice: str = DEFAULT_VOICE) -> Path:
     if not audio.exists() or not subtitles.exists():
         raise RuntimeError("Voice provider did not create both audio and subtitle files.")
 
-    subprocess.run(build_ffmpeg_command(background, audio, subtitles, video), check=True)
+    subprocess.run(build_ffmpeg_command(background, audio, subtitles, video, font_path), check=True)
     print(f"Rendered video: {video.relative_to(ROOT)}")
     print(f"Thumbnail: {thumbnail.relative_to(ROOT)}")
     return video
