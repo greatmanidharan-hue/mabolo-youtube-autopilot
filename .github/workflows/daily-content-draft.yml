@@ -25,12 +25,6 @@ jobs:
           sudo apt-get install -y ffmpeg fonts-noto-core
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Configure optional AI provider
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-        run: |
-          echo "Optional AI provider configured: $([ -n "$OPENROUTER_API_KEY" ] && echo yes || echo no)"
       - name: Run tests
         run: python -m unittest discover -s tests -v
       - name: Generate three rotating Tamil Shorts
