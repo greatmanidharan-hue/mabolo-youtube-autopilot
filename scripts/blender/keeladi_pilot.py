@@ -175,9 +175,7 @@ scene.camera=cams[0]
 scene.render.image_settings.color_mode="RGB"
 scene.render.film_transparent=False
 scene.eevee.taa_render_samples=32
-for action in bpy.data.actions:
-    for fc in action.fcurves:
-        for key in fc.keyframe_points: key.interpolation="BEZIER"
+# Blender 5.x uses layered Actions; default keyframe interpolation is sufficient here.
 scene.frame_set(1)
 print("Rendering Keeladi pilot PNG frames:", FRAME_DIR)
 bpy.ops.render.render(animation=True)
