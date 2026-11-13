@@ -15,6 +15,7 @@ A Tamil-first workflow for creating original YouTube Shorts, with a review-first
 - [x] Offline HTML preview gallery
 - [x] Unit tests for content, visuals, render command and publishing safety
 - [x] Editorial quality report distinguishes research leads from claim-level verification
+- [x] Free local Blender proof-of-concept for the Keeladi animated pilot (not yet rendered/validated)
 - [ ] Long-form video assembly
 - [x] Review-first YouTube OAuth upload CLI (manual credentials required)
 - [ ] Analytics and performance feedback loop
@@ -37,6 +38,9 @@ python -m src.daily_batch --count 3
 Each Short receives four original topic-matched illustrative scenes. The renderer divides the narration duration across those scenes and switches scenes through FFmpeg's concat demuxer. These are programmatic illustrations, not documentary photographs or depictions verified to be a specific archaeological site. Tamil subtitles use a smaller font, wide side margins, a bottom safe margin and automatic wrapping.
 
 The output includes JSON draft, MP3 narration, SRT subtitles, four scene PNGs, thumbnail, MP4, quality report, review queue and `preview-index.html`. After downloading and extracting the Actions artifact, open the gallery. On Android, if sibling media links fail in the Files preview, use **Choose MP4 file** and select the matching MP4 from the extracted folder.
+
+## Animated pilot (free/local-first)
+The Keeladi pilot storyboard and a procedural Blender 4.x scene script are in `content/pilots/` and `scripts/blender/`. Run `blender -b -P scripts/blender/keeladi_pilot.py` from the repository root to render a silent 36-second vertical 3D proof of concept into `output/`. It uses original procedural models and keyframed gestures/camera cuts. It is not yet a high-fidelity character animation and does not include facial rigging or lip-sync. The uploaded reference guides only the broad stylized 3D visual direction; no paid video generation has been used.
 
 ## AI provider
 Without `OPENROUTER_API_KEY`, a clearly labelled offline starter draft is generated. To enable AI-assisted scripts, add `OPENROUTER_API_KEY` under repository **Settings → Secrets and variables → Actions**. Optionally set `OPENROUTER_MODEL`. Never commit API keys or send them in chat.
