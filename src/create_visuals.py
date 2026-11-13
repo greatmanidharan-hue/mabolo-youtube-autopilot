@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_DIR = ROOT / "output"
@@ -191,20 +191,18 @@ def create_visuals(draft_path: Path) -> tuple[Path, Path]:
     stem = draft_path.stem
     scenes = create_scene_visuals(draft_path)
     vertical_path = scenes[0]
-    thumb = _gradient()
+    thumb = ImageOps.fit(Image.open(scenes[0]).convert("RGB"), (1280, 720), method=Image.Resampling.LANCZOS)
     td = ImageDraw.Draw(thumb, "RGBA")
-    td.rectangle((720, 190, 1240, 690), fill=(30, 45, 58, 255), outline=(220, 167, 93, 255), width=6)
-    td.ellipse((820, 260, 1140, 580), outline=(220, 167, 93, 255), width=12)
-    td.rounded_rectangle((48, 52, 830, 668), radius=28, fill=(7, 12, 26, 205),
-                         outline=(220, 167, 93, 190), width=3)
-    td.text((88, 92), "தமிழர் வரலாறு", font=_font(44, True), fill=(236, 192, 115, 255))
+    td.rounded_rectangle((36, 36, 900, 684), radius=26, fill=(7, 12, 26, 218),
+                         outline=(220, 167, 93, 220), width=4)
+    td.text((76, 76), "தமிழர் வரலாறு", font=_font(42, True), fill=(236, 192, 115, 255))
     font = _font(48, True)
-    y = 190
-    for line in _wrap(td, title, font, 680)[:4]:
-        td.text((90, y), line, font=font, fill=(255, 255, 255, 255),
+    y = 165
+    for line in _wrap(td, title, font, 760)[:5]:
+        td.text((78, y), line, font=font, fill=(255, 255, 255, 255),
                 stroke_width=2, stroke_fill=(8, 12, 22, 255))
-        y += 70
-    td.text((90, 610), "ஆதாரங்களுடன் அறிந்துகொள்வோம்", font=_font(27, True),
+        y += 76
+    td.text((78, 625), "ஆதாரங்களுடன் அறிந்துகொள்வோம்", font=_font(25, True),
             fill=(235, 194, 125, 255))
     thumb_path = OUTPUT_DIR / f"{stem}-thumbnail.jpg"
     thumb.convert("RGB").save(thumb_path, quality=92, optimize=True)
