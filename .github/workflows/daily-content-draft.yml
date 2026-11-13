@@ -1,6 +1,8 @@
 name: Daily Tamil Content Draft and Short Render
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: "30 2 * * *" # 08:00 Asia/Kolkata (UTC+05:30)
@@ -47,5 +49,6 @@ jobs:
             output/*.jpg
             output/*.mp4
             output/*.html
+            output/*-scenes.txt
           if-no-files-found: error
           retention-days: 14
