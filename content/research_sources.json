@@ -1,0 +1,27 @@
+{
+  "policy": "These are starting references, not proof that every script claim is supported. A human editor must open the linked reports and verify each factual claim before publication.",
+  "topics": [
+    {
+      "topic_contains": "கீழடி",
+      "sources": [
+        {"title": "Tamil Nadu Department of Archaeology — Keeladi", "url": "https://www.tnarch.gov.in/keeladi", "type": "official excavation overview"},
+        {"title": "Ministry of Culture — ASI Keezhadi excavation report announcement", "url": "https://culture.gov.in/latest-news/asi-publishes-keezhadi-excavation-report-line-scientific-protocols", "type": "official report announcement"},
+        {"title": "Archaeological Excavations in Tamil Nadu (2025)", "url": "https://www.tamildigitallibrary.in/assets/docs/uploads/catalogue_article_file/BOK/upload/2025/09/TVA_TVA_BOK_062719/upload_primary_20250923041727978_20250923031529.pdf", "type": "government archaeology publication"}
+      ]
+    },
+    {
+      "topic_contains": "கடல் வாணிபம்",
+      "sources": [
+        {"title": "Tamil Nadu Department of Archaeology — E-publications", "url": "https://www.tnarch.gov.in/e-publication-books-latest", "type": "official publication catalogue"},
+        {"title": "Pottery production and trades in Tamil Nadu region", "url": "https://www.nature.com/articles/s40494-020-00402-2", "type": "peer-reviewed research"}
+      ]
+    },
+    {
+      "topic_contains": "பூம்புகார்",
+      "sources": [
+        {"title": "Tamil Nadu Department of Archaeology — Archaeology and underwater archaeology", "url": "https://www.tnarch.gov.in/view-archaeology", "type": "official department overview"},
+        {"title": "Tamil Nadu Department of Archaeology — E-publications", "url": "https://www.tnarch.gov.in/e-publication-books-latest", "type": "official publication catalogue"}
+      ]
+    }
+  ]
+}
