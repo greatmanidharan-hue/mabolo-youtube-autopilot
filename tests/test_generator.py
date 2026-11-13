@@ -14,6 +14,24 @@ class GeneratorTests(unittest.TestCase):
         self.assertTrue(draft["script"])
         self.assertIn("research_checklist", draft)
 
+    def test_offline_draft_carries_research_leads_without_claiming_verification(self):
+        topic = {
+            "topic": "Test topic",
+            "angle": "Test angle",
+            "source_urls": ["https://example.org/report"],
+            "source_note": "Research leads only."
+        }
+        draft = build_offline_draft(topic)
+        self.assertEqual(draft["source_urls"], topic["source_urls"])
+        self.assertEqual(draft["source_note"], "Research leads only.")
+        self.assertFalse(draft["sources_verified"])
+        self.assertEqual(draft["claim_checks"], [])
+
+    def test_missing_source_urls_remain_empty(self):
+        draft = build_offline_draft({"topic": "Test", "angle": "Test angle"})
+        self.assertEqual(draft["source_urls"], [])
+        self.assertFalse(draft["sources_verified"])
+
 
 if __name__ == "__main__":
     unittest.main()
