@@ -39,9 +39,7 @@ Each Short receives four original topic-matched illustrative scenes. The rendere
 
 The output includes JSON draft, MP3 narration, SRT subtitles, four scene PNGs, thumbnail, MP4, quality report, review queue and `preview-index.html`. After downloading and extracting the Actions artifact, open the gallery. On Android, if sibling media links fail in the Files preview, use **Choose MP4 file** and select the matching MP4 from the extracted folder.
 
-## Animated pilot (free/local-first)
-The Keeladi pilot storyboard and a procedural Blender 4.x scene script are in `content/pilots/` and `scripts/blender/`. Run `blender -b -P scripts/blender/keeladi_pilot.py` from the repository root to render a silent 36-second vertical 3D proof of concept into `output/`. It uses original procedural models and keyframed gestures/camera cuts. It is not yet a high-fidelity character animation and does not include facial rigging or lip-sync. The uploaded reference guides only the broad stylized 3D visual direction; no paid video generation has been used.
-
+## Animated pilot integration (free/local-first)\nThe Keeladi pilot storyboard and procedural Blender scene are in `content/pilots/` and `scripts/blender/`. On Windows, install Blender 5.2+ and FFmpeg, then run `python -m src.animated_pilot` from the repository root. If Blender is not on PATH, pass `--blender "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe"`. The integration renders the silent 3D scene, generates Tamil narration and SRT captions with Edge TTS, and muxes them into `output/keeladi-pilot-final.mp4`. It does not upload or publish. The first scene is a procedural proof of concept, not high-fidelity character animation; no facial rigging or lip-sync is included. No paid video generation or credits are used.\n
 ## AI provider
 Without `OPENROUTER_API_KEY`, a clearly labelled offline starter draft is generated. To enable AI-assisted scripts, add `OPENROUTER_API_KEY` under repository **Settings → Secrets and variables → Actions**. Optionally set `OPENROUTER_MODEL`. Never commit API keys or send them in chat.
 
