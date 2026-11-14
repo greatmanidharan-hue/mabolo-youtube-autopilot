@@ -26,7 +26,10 @@ scene.frame_start, scene.frame_end = 1, 864
 scene.render.image_settings.file_format = "PNG"
 scene.render.image_settings.color_mode = "RGB"
 scene.render.filepath = os.path.join(FRAME_DIR, "frame_")
-scene.world.color = (0.22, 0.22, 0.22)
+scene.world.color = (0.35, 0.35, 0.35)
+scene.world.use_nodes = True
+scene.world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.32, 0.38, 0.48, 1)
+scene.world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.65
 scene.view_settings.view_transform = "AgX"
 
 def mat(name, color, rough=0.78, metallic=0.0):
@@ -83,9 +86,9 @@ def light(name,loc,energy,size,color,target):
     data=bpy.data.lights.new(name,"AREA"); data.energy=energy; data.shape="DISK"; data.size=size; data.color=color
     o=bpy.data.objects.new(name,data); scene.collection.objects.link(o); o.location=loc; look_at(o,target)
 
-light("warm key",(8,-12,16),1800,10,(1.0,0.72,0.48),(25,0,2))
-light("sky fill",(-8,-2,10),950,12,(0.55,0.68,1.0),(25,0,2))
-light("golden rim",(30,8,12),1300,8,(1.0,0.55,0.26),(25,0,2))
+light("warm key",(8,-12,16),2600,10,(1.0,0.72,0.48),(25,0,2))
+light("sky fill",(-8,-2,10),1800,12,(0.55,0.68,1.0),(25,0,2))
+light("golden rim",(30,8,12),1900,8,(1.0,0.55,0.26),(25,0,2))
 cube("earth stage",(30,0,-0.35),(90,28,0.7),EARTH,0.15)
 
 def hut(x,y=3):
@@ -105,17 +108,46 @@ def pot(x,y,z=0.7,size=1.0):
     cyl("pot rim",(x,y,z+0.68*size),0.29*size,0.08*size,BRASS)
 
 def person(name,x,y,clothing,s=1.0):
-    uv(name+" torso",(x,y,1.55*s),(0.48*s,0.32*s,0.68*s),clothing)
-    uv(name+" head",(x,y-0.02,2.48*s),(0.43*s,0.40*s,0.48*s),SKIN)
-    uv(name+" hair",(x,y+0.02,2.77*s),(0.45*s,0.42*s,0.27*s),HAIR)
-    for dx in (-0.15,0.15):
-        uv(name+" eye",(x+dx*s,y-0.385*s,2.52*s),(0.055*s,0.035*s,0.075*s),HAIR)
-    uv(name+" nose",(x,y-0.43*s,2.39*s),(0.07*s,0.07*s,0.09*s),SKIN)
+    """Stylized storybook character with layered face, hair, clothing and accessories."""
+    # Neck and softly tapered body
+    uv(name+" neck",(x,y-0.015,2.02*s),(0.17*s,0.18*s,0.25*s),SKIN)
+    torso=uv(name+" torso",(x,y,1.48*s),(0.49*s,0.34*s,0.67*s),clothing)
+    torso.scale.x *= 1.05
+    # Head, ears and shaped hair cap
+    uv(name+" head",(x,y-0.035*s,2.52*s),(0.43*s,0.385*s,0.49*s),SKIN)
     for side in (-1,1):
-        arm=uv(name+" arm",(x+side*0.56*s,y-0.02,1.75*s),(0.18*s,0.20*s,0.52*s),clothing)
-        arm.rotation_euler[1]=side*math.radians(18)
-        uv(name+" hand",(x+side*0.62*s,y-0.08,1.25*s),(0.16*s,0.15*s,0.16*s),SKIN)
-        uv(name+" leg",(x+side*0.20*s,y,0.55*s),(0.19*s,0.22*s,0.52*s),WOOD)
+        uv(name+" ear",(x+side*0.405*s,y-0.025*s,2.50*s),(0.105*s,0.105*s,0.15*s),SKIN)
+    uv(name+" hair cap",(x,y+0.015*s,2.82*s),(0.455*s,0.405*s,0.255*s),HAIR)
+    # Side locks and a small tied hair knot for a period-inspired silhouette
+    for side in (-1,1):
+        uv(name+" hair lock",(x+side*0.36*s,y+0.005*s,2.68*s),(0.105*s,0.30*s,0.25*s),HAIR)
+    uv(name+" hair knot",(x+0.02*s,y+0.31*s,2.89*s),(0.16*s,0.16*s,0.17*s),HAIR)
+    # Expressive eyes: warm whites, dark pupils and brows
+    for dx in (-0.155,0.155):
+        uv(name+" eye white",(x+dx*s,y-0.382*s,2.56*s),(0.083*s,0.045*s,0.105*s),mat("eye ivory "+name,(0.96,0.84,0.68),0.42))
+        uv(name+" pupil",(x+dx*s,y-0.424*s,2.555*s),(0.039*s,0.025*s,0.064*s),HAIR)
+        uv(name+" eye glint",(x+(dx-0.012)*s,y-0.447*s,2.585*s),(0.014*s,0.012*s,0.019*s),BRASS)
+        brow=uv(name+" eyebrow",(x+dx*s,y-0.382*s,2.70*s),(0.105*s,0.035*s,0.035*s),HAIR)
+        brow.rotation_euler[1]=(-0.12 if dx<0 else 0.12)
+    # Nose and a subtle smile
+    uv(name+" nose",(x,y-0.455*s,2.405*s),(0.075*s,0.075*s,0.10*s),SKIN)
+    smile=uv(name+" smile",(x,y-0.405*s,2.285*s),(0.105*s,0.025*s,0.026*s),HAIR)
+    # Traditional draped lower garment and shoulder sash
+    wrap=uv(name+" waist wrap",(x,y+0.015*s,0.99*s),(0.43*s,0.34*s,0.28*s),BLUE if clothing==OCHRE else clothing)
+    wrap.rotation_euler[1]=math.radians(3)
+    sash=uv(name+" shoulder sash",(x-0.23*s,y-0.30*s,1.68*s),(0.12*s,0.055*s,0.48*s),OCHRE if clothing!=OCHRE else ROSE)
+    sash.rotation_euler[1]=math.radians(-24)
+    # Arms, wrists, bangles and hands
+    for side in (-1,1):
+        arm=uv(name+" arm",(x+side*0.57*s,y-0.015*s,1.68*s),(0.19*s,0.205*s,0.49*s),SKIN)
+        arm.rotation_euler[1]=side*math.radians(17)
+        sleeve=uv(name+" sleeve",(x+side*0.51*s,y-0.015*s,1.80*s),(0.22*s,0.22*s,0.31*s),clothing)
+        sleeve.rotation_euler[1]=side*math.radians(17)
+        uv(name+" bangle",(x+side*0.66*s,y-0.08*s,1.25*s),(0.17*s,0.16*s,0.055*s),BRASS)
+        uv(name+" hand",(x+side*0.66*s,y-0.09*s,1.12*s),(0.16*s,0.15*s,0.17*s),SKIN)
+        leg=uv(name+" leg",(x+side*0.205*s,y,0.53*s),(0.19*s,0.22*s,0.50*s),SKIN)
+        uv(name+" anklet",(x+side*0.205*s,y-0.035*s,0.15*s),(0.20*s,0.22*s,0.045*s),BRASS)
+        uv(name+" foot",(x+side*0.205*s,y-0.13*s,0.085*s),(0.22*s,0.30*s,0.11*s),WOOD)
 
 # Shot 1 — dawn settlement
 hut(0,4); hut(-6,5); palm(-8,-1); palm(8,4)
