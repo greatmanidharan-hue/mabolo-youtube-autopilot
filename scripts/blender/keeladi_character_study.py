@@ -15,9 +15,9 @@ bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
 scene = bpy.context.scene
 scene.render.engine = "BLENDER_EEVEE"
-scene.render.resolution_x = 768
-scene.render.resolution_y = 1024
-scene.render.resolution_percentage = 75
+scene.render.resolution_x = 900
+scene.render.resolution_y = 1200
+scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = "PNG"
 scene.render.image_settings.color_mode = "RGBA"
 scene.render.film_transparent = False
@@ -44,8 +44,8 @@ ivory=material("eye ivory",(0.94,0.82,0.68),0.28)
 iris=material("deep brown iris",(0.12,0.055,0.028),0.25)
 black=material("pupil",(0.012,0.009,0.008),0.18)
 lip=material("soft warm lips",(0.36,0.095,0.075),0.48)
-sari=material("deep indigo cotton",(0.055,0.16,0.26),0.72)
-sari_hi=material("indigo fabric folds",(0.12,0.27,0.38),0.68)
+sari=material("deep indigo cotton",(0.035,0.13,0.22),0.82)
+sari_hi=material("indigo fabric folds",(0.10,0.23,0.33),0.82)
 ochre=material("ochre blouse",(0.68,0.31,0.09),0.68)
 gold=material("aged brass",(0.62,0.36,0.09),0.28,0.72)
 ground=material("studio warm slate",(0.12,0.15,0.19),0.88)
@@ -91,9 +91,18 @@ for side in (-1,1):
     tapered("upper leg",(x*0.95,0,0.92),(x*0.82,0,1.55),0.15,0.21,skin)
 # Wrapped skirt silhouette and visible pleat lines
 ellipsoid("long wrapped skirt",(0,0.02,1.38),(0.49,0.34,0.75),sari)
-for i in range(7):
-    x=-0.34+i*0.11
-    curve_tube("sari pleat",[(x,-0.285,1.95),(x*1.12,-0.34,1.45),(x*1.25,-0.28,0.78)],0.012,sari_hi,2)
+for i in range(9):
+    # Keep each fold seated on the skirt surface; avoid the previous dangling
+    # lines that extended below the hem.
+    x=-0.34+i*0.085
+    pts=[]
+    for z, widen in ((1.88,0.90),(1.52,1.00),(1.12,1.08),(0.78,1.02)):
+        xx=x*widen
+        nz=(z-1.38)/0.75
+        nx=xx/0.49
+        depth=0.02+0.34*math.sqrt(max(0.05,1-nx*nx-nz*nz))
+        pts.append((xx,-depth-0.012,z))
+    curve_tube("subtle stitched sari fold",pts,0.008,sari_hi,3)
 # Blouse torso and neck
 ellipsoid("blouse torso",(0,0,2.16),(0.42,0.29,0.58),ochre)
 ellipsoid("neck",(0,-0.01,2.72),(0.16,0.16,0.25),skin)
@@ -157,22 +166,22 @@ bpy.ops.mesh.primitive_plane_add(size=200, location=(0,0,0))
 smooth(bpy.context.object,ground)
 # Camera
 cam_data=bpy.data.cameras.new("portrait camera"); cam=bpy.data.objects.new("portrait camera",cam_data); scene.collection.objects.link(cam)
-cam.location=(5,-10,4.0); target=Vector((0,0,1.92)); cam.rotation_euler=(target-Vector(cam.location)).to_track_quat("-Z","Y").to_euler()
+cam.location=(3.6,-12,4.15); target=Vector((0,0,1.92)); cam.rotation_euler=(target-Vector(cam.location)).to_track_quat("-Z","Y").to_euler()
 cam_data.type="ORTHO"; cam_data.ortho_scale=4.55; scene.camera=cam
 # Soft studio lights
 def area(name,loc,power,size,color,target):
     data=bpy.data.lights.new(name,"AREA"); data.energy=power; data.shape="DISK"; data.size=size; data.color=color
     obj=bpy.data.objects.new(name,data); scene.collection.objects.link(obj); obj.location=loc
     obj.rotation_euler=(Vector(target)-obj.location).to_track_quat("-Z","Y").to_euler()
-area("large warm key",(-4,-6,7),850,5,(1.0,0.78,0.60),(0,0,2))
-area("soft cool fill",(4,-4,4),600,4,(0.62,0.76,1.0),(0,0,2))
-area("hair rim",(1,3,6),1000,3,(1.0,0.62,0.34),(0,0,2.5))
+area("large warm key",(-4,-6,7),1100,5,(1.0,0.78,0.60),(0,0,2))
+area("soft cool fill",(4,-4,4),850,4,(0.62,0.76,1.0),(0,0,2))
+area("hair rim",(1,3,6),1250,3,(1.0,0.62,0.34),(0,0,2.5))
 scene.render.filepath=PREVIEW
 scene.camera.data.lens=50
 scene.render.image_settings.file_format="PNG"
-scene.render.resolution_percentage=75
+scene.render.resolution_percentage=100
 scene.render.engine="BLENDER_EEVEE"
-scene.eevee.taa_render_samples=48
+scene.eevee.taa_render_samples=96
 scene.frame_set(1)
 print("Rendering high-end stylized Keeladi character study:",PREVIEW)
 bpy.ops.render.render(write_still=True)
