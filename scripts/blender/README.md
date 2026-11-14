@@ -23,3 +23,16 @@ From the repository root, run:
 ```
 
 The single PNG preview is written to `output/keeladi-character-study.png`. Review this still before attempting another long animation render. The model is procedural and intended as a free stylized character-design prototype; it is not yet a production rig or a claim of feature-film asset quality.
+
+
+## Full-body character v2 (based on user-provided style script)
+
+This separate script adapts the supplied stylized head, expressive eyes, material and three-point-lighting ideas into a complete full-body character with arms, fingers, legs, draped clothing and jewelry. It uses EEVEE so a supported CUDA/OptiX GPU is not required.
+
+Run from the repository root:
+
+```cmd
+"C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe" -b -P scripts\\blender\\keeladi_character_v2.py
+```
+
+Output: `output/keeladi-character-v2.png`. This is a still preview, not a rigged or animated production character.
