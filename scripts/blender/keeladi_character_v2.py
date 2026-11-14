@@ -23,6 +23,8 @@ scene.render.image_settings.file_format = "PNG"
 scene.render.image_settings.color_mode = "RGBA"
 scene.view_settings.view_transform = "AgX"
 scene.view_settings.look = "AgX - Medium High Contrast"
+if scene.world is None:
+    scene.world = bpy.data.worlds.new("Keeladi Character World")
 scene.world.use_nodes = True
 bg = scene.world.node_tree.nodes["Background"]
 bg.inputs["Color"].default_value = (0.035, 0.055, 0.085, 1)
