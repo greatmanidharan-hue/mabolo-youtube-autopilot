@@ -209,6 +209,15 @@ scene.render.film_transparent=False
 scene.eevee.taa_render_samples=32
 # Blender 5.x uses layered Actions; default keyframe interpolation is sufficient here.
 scene.frame_set(1)
+if os.getenv("KEELADI_PREVIEW") == "1":
+    scene.render.resolution_percentage = 40
+    scene.frame_set(26)
+    preview_path = os.path.join(OUT, "keeladi-character-preview.png")
+    scene.render.filepath = preview_path
+    bpy.ops.render.render(write_still=True)
+    print("Character preview ready:", preview_path)
+    raise SystemExit(0)
+
 print("Rendering Keeladi pilot PNG frames:", FRAME_DIR)
 bpy.ops.render.render(animation=True)
 
