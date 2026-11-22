@@ -1,23 +1,49 @@
+import json
 import unittest
-from datetime import date
+from unittest.mock import patch
 
-from src.daily_batch import select_daily_topics
+from src.trend_discovery import discover_trending_topics
 
 
-class DailyBatchTests(unittest.TestCase):
-    def test_batch_selects_distinct_topics(self):
-        selected = select_daily_topics(date(2026, 11, 13), 3)
-        self.assertEqual(len(selected), 3)
-        self.assertEqual(len({item["topic"] for item in selected}), 3)
+class _Response:
+    def __init__(self, payload):
+        self.payload = payload
+    def __enter__(self):
+        return self
+    def __exit__(self, *args):
+        return False
+    def read(self):
+        return json.dumps(self.payload).encode("utf-8")
 
-    def test_rotation_changes_by_day(self):
-        first = select_daily_topics(date(2026, 11, 13), 1)[0]["topic"]
-        second = select_daily_topics(date(2026, 11, 14), 1)[0]["topic"]
-        self.assertNotEqual(first, second)
+
+class TrendDiscoveryTests(unittest.TestCase):
+    def test_requires_youtube_api_key(self):
+        with patch.dict("os.environ", {"YOUTUBE_API_KEY": ""}, clear=False):
+            with self.assertRaisesRegex(RuntimeError, "YOUTUBE_API_KEY"):
+                discover_trending_topics()
 
     def test_rejects_invalid_count(self):
         with self.assertRaises(ValueError):
-            select_daily_topics(date(2026, 11, 13), 0)
+            discover_trending_topics("test-key", count=0)
+
+    @patch("src.trend_discovery.urllib.request.urlopen")
+    def test_returns_topic_metadata_without_source_media(self, mocked_open):
+        mocked_open.return_value = _Response({"items": [{
+            "id": "abc123",
+            "snippet": {
+                "title": "Popular science topic",
+                "channelTitle": "Example Channel",
+                "publishedAt": "2026-11-22T10:00:00Z",
+                "liveBroadcastContent": "none"
+            },
+            "statistics": {"viewCount": "120000", "likeCount": "4000", "commentCount": "300"}
+        }]})
+        topics = discover_trending_topics("test-key", count=1)
+        self.assertEqual(topics[0]["topic"], "Popular science topic")
+        self.assertEqual(topics[0]["trend_metadata"]["video_id"], "abc123")
+        self.assertEqual(topics[0]["source_urls"], ["https://www.youtube.com/watch?v=abc123"])
+        self.assertNotIn("video_file", topics[0])
+        self.assertNotIn("transcript", topics[0])
 
 
 if __name__ == "__main__":
