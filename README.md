@@ -1,30 +1,36 @@
-# MABOLO TECH — YouTube Auto Pilot
+# MABOLO TECH — Simple Tamil Viral Topic Autopilot
 
-A Tamil-first workflow for creating original YouTube Shorts, with a review-first publishing approach.
+A review-first workflow that discovers popular YouTube topics in India and creates a **new, original Tamil Short** about the same broad subject.
 
-## MVP status
-- [x] Tamil topic bank and script draft generator
-- [x] Optional OpenRouter-compatible AI script generation
-- [x] Tamil text-to-speech adapter (Edge TTS)
-- [x] SRT subtitle generation
-- [x] Four original topic-matched scene illustrations per Short
-- [x] FFmpeg 1080×1920 vertical slideshow rendering with narration and subtitles
-- [x] Daily GitHub Actions workflow and artifact output
-- [x] Three-topic rotating daily batch (distinct topics selected by date)
-- [x] Review-first upload queue manifest with private-by-default status
-- [x] Offline HTML preview gallery
-- [x] Unit tests for content, visuals, render command and publishing safety
-- [x] Editorial quality report distinguishes research leads from claim-level verification
-- [x] Free local Blender proof-of-concept for the Keeladi animated pilot (not yet rendered/validated)
-- [ ] Long-form video assembly
-- [x] Review-first YouTube OAuth upload CLI (manual credentials required)
-- [ ] Analytics and performance feedback loop
+## Workflow
+1. Read public popularity metadata from YouTube's official Data API.
+2. Rank candidate topics using views-per-hour and engagement as a heuristic.
+3. Write a fresh Tamil script with OpenRouter.
+4. Generate new Tamil voiceover and subtitles with Edge TTS.
+5. Create original non-3D illustrative visuals and assemble a vertical video with FFmpeg.
+6. Save the draft, metadata, quality report and preview for human review.
 
-## Editorial direction
-Initial direction: **Tamil History & Ancient Mysteries**. Separate archaeological evidence, scholarly interpretation, literary tradition and folklore. Never present disputed claims as established fact.
+## Copyright and monetization safeguards
+- Never download or reuse another creator's video, audio, transcript, thumbnail, logo or distinctive branding.
+- Do not translate or closely paraphrase the source video's script. Use original wording, structure and explanation.
+- Use original visuals or assets with a verified commercial-use licence. Current visuals are simple original illustrations, not documentary photographs.
+- Verify the TTS provider's current commercial-use terms before monetizing.
+- A trend URL and metadata are discovery leads, not factual sources. Verify every factual claim using reliable sources.
+- Outputs remain review-required and private by default. Nothing is automatically uploaded or published.
+- These safeguards reduce risk but cannot guarantee monetization. Follow YouTube's current originality, reused-content, copyright and advertiser-friendly policies.
+
+## GitHub Actions secrets
+Add repository secrets under Settings → Secrets and variables → Actions:
+- `YOUTUBE_API_KEY`: Google API key with YouTube Data API v3 enabled.
+- `OPENROUTER_API_KEY`: API key for original Tamil script generation.
+
+Optional variable: `OPENROUTER_MODEL` (defaults to `openai/gpt-4o-mini`).
+Trend region defaults to `IN`.
+
+The workflow runs daily at 08:00 Asia/Kolkata and can be started manually. It creates one Short per run. If a required secret is missing, it stops with a clear error rather than silently using an unrelated topic-bank draft.
 
 ## Local setup
-Requires Python 3.11+, FFmpeg with the concat demuxer and subtitles/libass filter, ffprobe, and Noto Sans Tamil. Set `TAMIL_FONT_PATH` if the font is installed in a non-standard location.
+Requires Python 3.11+, FFmpeg, ffprobe, Noto Sans Tamil, and both API keys.
 
 ```bash
 python -m venv .venv
@@ -32,38 +38,13 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 python -m unittest discover -s tests -v
-python -m src.daily_batch --count 3
+python -m src.daily_batch --count 1
 ```
 
-Each Short receives four original topic-matched illustrative scenes. The renderer divides the narration duration across those scenes and switches scenes through FFmpeg's concat demuxer. These are programmatic illustrations, not documentary photographs or depictions verified to be a specific archaeological site. Tamil subtitles use a smaller font, wide side margins, a bottom safe margin and automatic wrapping.
+Outputs include script JSON, MP3 narration, SRT subtitles, original scene PNGs, MP4, quality report, private review queue and HTML preview.
 
-The output includes JSON draft, MP3 narration, SRT subtitles, four scene PNGs, thumbnail, MP4, quality report, review queue and `preview-index.html`. After downloading and extracting the Actions artifact, open the gallery. On Android, if sibling media links fail in the Files preview, use **Choose MP4 file** and select the matching MP4 from the extracted folder.
+## Publishing
+The workflow does not publish to YouTube. Review the script, claims, asset licences and finished video first. Use the existing manual OAuth upload process only after approval. Public publishing remains blocked until human review and claim verification are complete.
 
-## Animated pilot integration (free/local-first)\nThe Keeladi pilot storyboard and procedural Blender scene are in `content/pilots/` and `scripts/blender/`. On Windows, install Blender 5.2+ and FFmpeg, then run `python -m src.animated_pilot` from the repository root. If Blender is not on PATH, pass `--blender "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe"`. The integration renders the silent 3D scene, generates Tamil narration and SRT captions with Edge TTS, and muxes them into `output/keeladi-pilot-final.mp4`. It does not upload or publish. The first scene is a procedural proof of concept, not high-fidelity character animation; no facial rigging or lip-sync is included. No paid video generation or credits are used.\n
-## AI provider
-Without `OPENROUTER_API_KEY`, a clearly labelled offline starter draft is generated. To enable AI-assisted scripts, add `OPENROUTER_API_KEY` under repository **Settings → Secrets and variables → Actions**. Optionally set `OPENROUTER_MODEL`. Never commit API keys or send them in chat.
-
-## Daily automation
-GitHub Actions is scheduled for 08:00 Asia/Kolkata. It selects three different topics, creates drafts, runs tests, generates narration and four scene illustrations per topic, renders three vertical videos, writes an upload review manifest and preview gallery, then stores outputs as an artifact for 14 days. The queue does not upload or publish anything.
-
-## Editorial quality gate
-Source URLs are research leads only, not proof that claims were checked. Drafts start with `sources_verified: false` and an empty `claim_checks` list. Public upload is blocked unless a human has completed editorial review and claim-by-claim source verification. The quality report never auto-approves a draft.
-
-## YouTube publishing
-The current workflow does **not** upload videos to YouTube. Uploading requires a Google OAuth 2.0 client and the YouTube Data API. The local CLI defaults to private. Public publishing remains blocked until a human documents editorial approval and source verification.
-
-## Copyright, factual accuracy and quality
-- Use original scripts, narration and artwork or assets with verified licences.
-- Do not use copyrighted footage/music without permission.
-- Fact-check historical claims against reliable publications.
-- Review every generated video before public publishing.
-- Edge TTS is an online service; confirm its current terms before monetized production.
-
-## Project structure
-```
-src/                  content generation, visuals and rendering
-tests/                automated tests
-content/topics.json   starter Tamil topic bank
-output/               generated files (git-ignored)
-.github/workflows/    scheduled automation
-```
+## Intentionally out of scope
+Blender, 3D characters, character animation, lip-sync and paid cinematic video generation.
