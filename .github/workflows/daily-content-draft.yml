@@ -1,6 +1,7 @@
 name: Daily Tamil Viral Topic Short
 
 on:
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron: "30 2 * * *" # 08:00 Asia/Kolkata (UTC+05:30)
