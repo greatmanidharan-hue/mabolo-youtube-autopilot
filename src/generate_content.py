@@ -79,7 +79,8 @@ def generate_with_openrouter(topic: dict[str, Any], api_key: str, model: str) ->
         "do not imply you opened or read them, do not invent citations, and do not claim "
         "they prove any statement. Ask the human editor to verify every factual claim "
         "against the original publication.\n"
-        f"Topic: {topic['topic']}\nAngle: {topic['angle']}\n"
+        f"Trend title (topic inspiration only): {topic['topic']}\nAngle: {topic['angle']}\n"
+        "Write a genuinely original Tamil explanation with a different structure and wording. Never translate or closely paraphrase the source video. Never use its transcript, footage, audio, thumbnail, branding or creator identity. Do not claim facts based only on trend metadata. Include a research checklist for factual claims and clearly mark uncertainty.\n"
         f"Research lead URLs: {json.dumps(source_urls, ensure_ascii=False)}"
     )
     body = json.dumps({
@@ -113,7 +114,8 @@ def generate_with_openrouter(topic: dict[str, Any], api_key: str, model: str) ->
         "language": "Tamil",
         "format": "YouTube Short",
         "generated_with": model,
-        "review_required": True
+        "review_required": True,
+        "trend_metadata": topic.get("trend_metadata", {})
     })
     draft.update(_source_metadata(topic))
     return draft
