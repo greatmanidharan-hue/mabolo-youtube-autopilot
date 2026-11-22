@@ -1,8 +1,6 @@
-name: Daily Tamil Content Draft and Short Render
+name: Daily Tamil Viral Topic Short
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: "30 2 * * *" # 08:00 Asia/Kolkata (UTC+05:30)
@@ -31,16 +29,18 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run tests
         run: python -m unittest discover -s tests -v
-      - name: Generate three rotating Tamil Shorts
+      - name: Discover a popular topic and create one original Tamil Short
         env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_TREND_REGION: IN
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
           TAMIL_TTS_VOICE: ta-IN-PallaviNeural
-        run: python -m src.daily_batch --count 3
-      - name: Save draft, visuals and video artifacts
+        run: python -m src.daily_batch --count 1
+      - name: Save review artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mabolo-tamil-youtube-short
+          name: mabolo-original-tamil-short
           path: |
             output/*.json
             output/*.mp3
