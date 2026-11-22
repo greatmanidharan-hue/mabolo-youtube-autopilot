@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +10,6 @@ from src.trend_discovery import discover_trending_topics
 
 from src.generate_content import (
     OUTPUT_DIR,
-    build_offline_draft,
     generate_with_openrouter,
 )
 from src.preview_gallery import write_preview_gallery
@@ -22,10 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def write_draft(topic: dict[str, Any], index: int, api_key: str, model: str, stamp: str) -> Path:
-    draft: dict[str, Any] = (
-        generate_with_openrouter(topic, api_key, model)
-        if api_key else build_offline_draft(topic)
-    )
+    draft: dict[str, Any] = generate_with_openrouter(topic, api_key, model)
     draft["trend_metadata"] = topic.get("trend_metadata", {})
     draft["created_at"] = datetime.now(timezone.utc).isoformat()
     draft["daily_batch_index"] = index
@@ -42,7 +38,6 @@ def run_batch(count: int = 3) -> list[Path]:
     youtube_key = os.getenv("YOUTUBE_API_KEY", "").strip()
     model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
     voice = os.getenv("TAMIL_TTS_VOICE", DEFAULT_VOICE)
-    today = date.today()
     topics = discover_trending_topics(youtube_key, count=count, region=os.getenv("YOUTUBE_TREND_REGION", "IN"))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     results: list[Path] = []
