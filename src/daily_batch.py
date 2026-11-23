@@ -20,6 +20,11 @@ from src.upload_queue import build_queue_entry, write_upload_queue
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def resolve_openrouter_model() -> str:
+    """Use a valid default when the optional Actions variable is unset or blank."""
+    return os.getenv("OPENROUTER_MODEL", "").strip() or "openai/gpt-4o-mini"
+
+
 def write_draft(topic: dict[str, Any], index: int, api_key: str, model: str, stamp: str) -> Path:
     draft: dict[str, Any] = generate_with_openrouter(topic, api_key, model)
     draft["trend_metadata"] = topic.get("trend_metadata", {})
@@ -36,7 +41,7 @@ def run_batch(count: int = 3) -> list[Path]:
     if not api_key:
         raise RuntimeError("OPENROUTER_API_KEY is required for original Tamil scripts.")
     youtube_key = os.getenv("YOUTUBE_API_KEY", "").strip()
-    model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+    model = resolve_openrouter_model()
     voice = os.getenv("TAMIL_TTS_VOICE", DEFAULT_VOICE)
     topics = discover_trending_topics(youtube_key, count=count, region=os.getenv("YOUTUBE_TREND_REGION", "IN"))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
