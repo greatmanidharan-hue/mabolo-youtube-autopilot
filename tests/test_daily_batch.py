@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from src.trend_discovery import discover_trending_topics
+from src.daily_batch import resolve_openrouter_model
 
 
 class _Response:
@@ -17,6 +18,16 @@ class _Response:
 
 
 class TrendDiscoveryTests(unittest.TestCase):
+    def test_blank_openrouter_model_uses_valid_default(self):
+        from unittest.mock import patch
+        with patch.dict("os.environ", {"OPENROUTER_MODEL": ""}):
+            self.assertEqual(resolve_openrouter_model(), "openai/gpt-4o-mini")
+
+    def test_custom_openrouter_model_is_preserved(self):
+        from unittest.mock import patch
+        with patch.dict("os.environ", {"OPENROUTER_MODEL": "google/gemini-2.5-flash"}):
+            self.assertEqual(resolve_openrouter_model(), "google/gemini-2.5-flash")
+
     def test_requires_youtube_api_key(self):
         with patch.dict("os.environ", {"YOUTUBE_API_KEY": ""}, clear=False):
             with self.assertRaisesRegex(RuntimeError, "YOUTUBE_API_KEY"):
