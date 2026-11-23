@@ -102,6 +102,9 @@ def generate_with_openrouter(topic: dict[str, Any], api_key: str, model: str) ->
     try:
         with urllib.request.urlopen(request, timeout=60) as response:
             payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")[:1200]
+        raise RuntimeError(f"OpenRouter HTTP {exc.code}: {detail}") from exc
     except (urllib.error.URLError, TimeoutError) as exc:
         raise RuntimeError(f"AI provider request failed: {exc}") from exc
 
