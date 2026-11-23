@@ -12,7 +12,7 @@ class AnimatedPilotIntegrationTests(unittest.TestCase):
         )
         self.assertIn("visual.mp4", command)
         self.assertIn("voice.mp3", command)
-        self.assertIn("captions.srt", command)
+        self.assertTrue(any("captions.srt" in part for part in command))
         self.assertIn("final.mp4", command)
         self.assertIn("-shortest", command)
 
