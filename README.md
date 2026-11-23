@@ -1,6 +1,6 @@
 # MABOLO TECH — Simple Tamil Viral Topic Autopilot
 
-A review-first workflow that discovers popular YouTube topics in India and creates a **new, original Tamil Short** about the same broad subject.
+A review-first workflow that discovers popular YouTube topics across selected countries and creates a **new, original Tamil Short** about the same broad subject.
 
 ## Workflow
 1. Read public popularity metadata from YouTube's official Data API.
@@ -25,7 +25,7 @@ Add repository secrets under Settings → Secrets and variables → Actions:
 - `OPENROUTER_API_KEY`: API key for original Tamil script generation.
 
 Optional variable: `OPENROUTER_MODEL` (defaults to `openai/gpt-4o-mini`).
-Trend region defaults to `IN`.
+Trend discovery currently compares popular-video metadata across selected regions: US, GB, CA, AU, JP, KR, IN, DE and BR. This is a popularity heuristic, not a definitive viral ranking.
 
 The workflow runs daily at 08:00 Asia/Kolkata and can be started manually. It creates one Short per run. If a required secret is missing, it stops with a clear error rather than silently using an unrelated topic-bank draft.
 
@@ -41,7 +41,7 @@ python -m unittest discover -s tests -v
 python -m src.daily_batch --count 1
 ```
 
-Outputs include script JSON, MP3 narration, SRT subtitles, original scene PNGs, MP4, quality report, private review queue and HTML preview.
+Outputs include script JSON, MP3 narration, SRT subtitles, scene PNGs, MP4, quality report, private review queue and HTML preview.\n\n## Reference shot analysis (user-owned/licensed clips only)\n\n```bash\npython -m src.analyze_reference --input path/to/your-authorized-reference.mp4\n```\n\nThis extracts scene-change frames and writes a timestamped `*-shot-plan.json` under `output/reference_analysis/`. It does not generate replacement characters or final video yet; the current renderer still uses abstract placeholder illustrations. The next integration step is a video-generation provider that consumes the shot plan and produces new Indian-character shots.
 
 ## Publishing
 The workflow does not publish to YouTube. Review the script, claims, asset licences and finished video first. Use the existing manual OAuth upload process only after approval. Public publishing remains blocked until human review and claim verification are complete.
