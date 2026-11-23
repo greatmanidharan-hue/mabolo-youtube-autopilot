@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from src.trend_discovery import discover_trending_topics
+
 from src.generate_content import (
     OUTPUT_DIR,
-    build_offline_draft,
     generate_with_openrouter,
-    load_topics,
 )
 from src.preview_gallery import write_preview_gallery
 from src.quality_check import assess_draft
@@ -20,21 +20,14 @@ from src.upload_queue import build_queue_entry, write_upload_queue
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def select_daily_topics(day: date, count: int = 3) -> list[dict[str, Any]]:
-    if count < 1:
-        raise ValueError("count must be at least 1")
-    topics = load_topics()
-    if not topics:
-        raise ValueError("Topic bank is empty")
-    start = day.toordinal() % len(topics)
-    return [topics[(start + offset) % len(topics)] for offset in range(min(count, len(topics)))]
+def resolve_openrouter_model() -> str:
+    """Use a valid default when the optional Actions variable is unset or blank."""
+    return os.getenv("OPENROUTER_MODEL", "").strip() or "openai/gpt-4o-mini"
 
 
 def write_draft(topic: dict[str, Any], index: int, api_key: str, model: str, stamp: str) -> Path:
-    draft: dict[str, Any] = (
-        generate_with_openrouter(topic, api_key, model)
-        if api_key else build_offline_draft(topic)
-    )
+    draft: dict[str, Any] = generate_with_openrouter(topic, api_key, model)
+    draft["trend_metadata"] = topic.get("trend_metadata", {})
     draft["created_at"] = datetime.now(timezone.utc).isoformat()
     draft["daily_batch_index"] = index
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -45,10 +38,12 @@ def write_draft(topic: dict[str, Any], index: int, api_key: str, model: str, sta
 
 def run_batch(count: int = 3) -> list[Path]:
     api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
-    model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY is required for original Tamil scripts.")
+    youtube_key = os.getenv("YOUTUBE_API_KEY", "").strip()
+    model = resolve_openrouter_model()
     voice = os.getenv("TAMIL_TTS_VOICE", DEFAULT_VOICE)
-    today = date.today()
-    topics = select_daily_topics(today, count)
+    topics = discover_trending_topics(youtube_key, count=count, region=os.getenv("YOUTUBE_TREND_REGION", "IN"))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     results: list[Path] = []
     queue_entries: list[dict[str, Any]] = []
@@ -83,8 +78,8 @@ def run_batch(count: int = 3) -> list[Path]:
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Create a rotating daily batch of Tamil Shorts.")
-    parser.add_argument("--count", type=int, default=3, help="Number of different Shorts to create (max topic bank size).")
+    parser = argparse.ArgumentParser(description="Create original Tamil Shorts from YouTube trending topics.")
+    parser.add_argument("--count", type=int, default=3, help="Number of trending topics to turn into original Tamil Shorts.")
     args = parser.parse_args()
     paths = run_batch(args.count)
     print(f"Daily batch complete: {len(paths)} output files")

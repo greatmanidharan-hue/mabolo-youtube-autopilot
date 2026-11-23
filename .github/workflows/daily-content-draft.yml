@@ -1,8 +1,7 @@
-name: Daily Tamil Content Draft and Short Render
+name: Daily Tamil Viral Topic Short
 
 on:
-  push:
-    branches: [main]
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron: "30 2 * * *" # 08:00 Asia/Kolkata (UTC+05:30)
@@ -11,7 +10,27 @@ permissions:
   contents: read
 
 jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install FFmpeg and Tamil font
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-core fonts-noto-extra
+          fc-cache -f
+          fc-match 'Noto Sans Tamil' | grep -qi 'Noto Sans Tamil' || (echo 'Noto Sans Tamil font unavailable' && exit 1)
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
   create-and-render:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -31,16 +50,18 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run tests
         run: python -m unittest discover -s tests -v
-      - name: Generate three rotating Tamil Shorts
+      - name: Discover a popular topic and create one original Tamil Short
         env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_TREND_REGION: GLOBAL
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'openai/gpt-4o-mini' }}
           TAMIL_TTS_VOICE: ta-IN-PallaviNeural
-        run: python -m src.daily_batch --count 3
-      - name: Save draft, visuals and video artifacts
+        run: python -m src.daily_batch --count 1
+      - name: Save review artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mabolo-tamil-youtube-short
+          name: mabolo-original-tamil-short
           path: |
             output/*.json
             output/*.mp3
