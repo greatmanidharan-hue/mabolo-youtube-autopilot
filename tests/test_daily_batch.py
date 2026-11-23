@@ -33,7 +33,7 @@ class TrendDiscoveryTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "YOUTUBE_API_KEY"):
                 discover_trending_topics()
 
-    def test_rejects_invalid_count(self):
+    def test_explicit_region_limits_lookup_to_that_country(self):\n        with patch("src.trend_discovery.urllib.request.urlopen", return_value=_Response({"items": []})) as mocked_open:\n            with self.assertRaisesRegex(RuntimeError, "no usable popular videos"):\n                discover_trending_topics("test-key", count=1, region="JP")\n            self.assertEqual(mocked_open.call_count, 1)\n            self.assertIn("regionCode=JP", mocked_open.call_args.args[0].full_url)\n\n    def test_rejects_invalid_count(self):
         with self.assertRaises(ValueError):
             discover_trending_topics("test-key", count=0)
 
@@ -51,7 +51,7 @@ class TrendDiscoveryTests(unittest.TestCase):
         }]})
         topics = discover_trending_topics("test-key", count=1)
         self.assertEqual(topics[0]["topic"], "Popular science topic")
-        self.assertEqual(topics[0]["trend_metadata"]["video_id"], "abc123")
+        self.assertEqual(topics[0]["trend_metadata"]["video_id"], "abc123")\n        self.assertEqual(topics[0]["trend_metadata"]["regions_seen"], ["US", "GB", "CA", "AU", "JP", "KR", "IN", "DE", "BR"])\n        self.assertEqual(mocked_open.call_count, 9)
         self.assertEqual(topics[0]["source_urls"], ["https://www.youtube.com/watch?v=abc123"])
         self.assertNotIn("video_file", topics[0])
         self.assertNotIn("transcript", topics[0])
