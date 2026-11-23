@@ -18,6 +18,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install FFmpeg and Tamil font
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-core fonts-noto-extra
+          fc-cache -f
+          fc-match 'Noto Sans Tamil' | grep -qi 'Noto Sans Tamil' || (echo 'Noto Sans Tamil font unavailable' && exit 1)
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Run tests
